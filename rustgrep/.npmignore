@@ -1,0 +1,9 @@
+src/
+target/
+.github/
+.gitignore
+Cargo.toml
+Cargo.lock
+install.sh
+*.md
+!README.md

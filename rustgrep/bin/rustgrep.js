@@ -2,13 +2,8 @@
 
 const { spawn } = require('child_process');
 const path = require('path');
-const os = require('os');
 
-const platform = os.platform();
-const arch = os.arch();
-
-let binaryName = platform === 'win32' ? 'rustgrep.exe' : 'rustgrep';
-const binaryPath = path.join(__dirname, '..', 'bin', binaryName);
+const binaryPath = path.join(__dirname, 'rustgrep');
 
 const child = spawn(binaryPath, process.argv.slice(2), {
   stdio: 'inherit'

@@ -5,12 +5,8 @@
   "bin": {
     "rustgrep": "./bin/rustgrep.js"
   },
-  "scripts": {
-    "postinstall": "node scripts/install.js"
-  },
   "files": [
     "bin/",
-    "scripts/",
     "README.md"
   ],
   "keywords": [
@@ -30,9 +26,6 @@
     "url": "https://github.com/kevin-zhangwen/rustgrep/issues"
   },
   "homepage": "https://github.com/kevin-zhangwen/rustgrep#readme",
-  "engines": {
-    "node": ">=14"
-  },
   "os": [
     "darwin",
     "linux"
