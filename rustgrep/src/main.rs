@@ -1,5 +1,5 @@
 use clap::Parser;
-use regex::Regex;
+use regex::{Regex, RegexBuilder};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
@@ -34,14 +34,10 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    // Build regex pattern
-    let pattern = if args.ignore_case {
-        format!("(?i){}", args.pattern)
-    } else {
-        args.pattern.clone()
-    };
-
-    let re = match Regex::new(&pattern) {
+    let re = match RegexBuilder::new(&args.pattern)
+        .case_insensitive(args.ignore_case)
+        .build()
+    {
         Ok(re) => re,
         Err(e) => {
             eprintln!("Invalid regex pattern: {}", e);
@@ -59,7 +55,7 @@ fn main() {
             std::process::exit(1);
         }
     } else if path.is_file() {
-        search_file(&re, path, &args, None);
+        search_file(&re, path, &args);
     } else {
         eprintln!("{}: No such file or directory", args.path);
         std::process::exit(1);
@@ -72,12 +68,11 @@ fn search_directory_recursive(re: &Regex, dir: &Path, args: &Args) {
         .filter_map(|e| e.ok())
         .filter(|e| e.file_type().is_file())
     {
-        let path = entry.path();
-        search_file(re, path, args, Some(&args.path));
+        search_file(re, entry.path(), args);
     }
 }
 
-fn search_file(re: &Regex, path: &Path, args: &Args, base_path: Option<&str>) {
+fn search_file(re: &Regex, path: &Path, args: &Args) {
     let file = match File::open(path) {
         Ok(f) => f,
         Err(e) => {
@@ -87,38 +82,22 @@ fn search_file(re: &Regex, path: &Path, args: &Args, base_path: Option<&str>) {
     };
 
     let reader = BufReader::new(file);
-    let path_display = path.display().to_string();
-    let relative_path = if let Some(base) = base_path {
-        path.strip_prefix(base)
-            .map(|p| p.display().to_string())
-            .unwrap_or_else(|_| path_display.clone())
-    } else {
-        path_display.clone()
-    };
 
     for (line_num, line_result) in reader.lines().enumerate() {
-        let line_num = line_num + 1; // 1-indexed
-
+        let line_num = line_num + 1;
         let line = match line_result {
             Ok(l) => l,
             Err(_) => continue,
         };
 
         if re.is_match(&line) {
-            if args.recursive {
-                // Show filename prefix for recursive search
-                if args.line_number {
-                    println!("{}:{}:{}", relative_path, line_num, line);
-                } else {
-                    println!("{}:{}", relative_path, line);
-                }
-            } else {
-                if args.line_number {
-                    println!("{}:{}", line_num, line);
-                } else {
-                    println!("{}", line);
-                }
-            }
+            let prefix = match (args.recursive, args.line_number) {
+                (true, true) => format!("{}:{}:", path.display(), line_num),
+                (true, false) => format!("{}:", path.display()),
+                (false, true) => format!("{}:", line_num),
+                (false, false) => String::new(),
+            };
+            println!("{}{}", prefix, line);
         }
     }
 }
