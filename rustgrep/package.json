@@ -1,0 +1,40 @@
+{
+  "name": "@kevin-zhangwen/rustgrep",
+  "version": "0.1.0",
+  "description": "A fast grep-like search tool written in Rust",
+  "bin": {
+    "rustgrep": "./bin/rustgrep.js"
+  },
+  "scripts": {
+    "postinstall": "node scripts/install.js"
+  },
+  "files": [
+    "bin/",
+    "scripts/",
+    "README.md"
+  ],
+  "keywords": [
+    "grep",
+    "search",
+    "rust",
+    "cli",
+    "regex"
+  ],
+  "author": "kevin-zhangwen",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevin-zhangwen/rustgrep.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kevin-zhangwen/rustgrep/issues"
+  },
+  "homepage": "https://github.com/kevin-zhangwen/rustgrep#readme",
+  "engines": {
+    "node": ">=14"
+  },
+  "os": [
+    "darwin",
+    "linux"
+  ]
+}
